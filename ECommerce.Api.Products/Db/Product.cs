@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ECommerce.Api.Products.Database
+namespace ECommerce.Api.Products.Db
 {
     //This model is designed for Db access
     public class Product
