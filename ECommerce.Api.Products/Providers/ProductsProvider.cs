@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using ECommerce.Api.Products.Database;
+using ECommerce.Api.Products.Db;
 using ECommerce.Api.Products.Interfaces;
 using ECommerce.Api.Products.Models;
 using Microsoft.EntityFrameworkCore;
@@ -30,17 +30,16 @@ namespace ECommerce.Api.Products.Providers
         {
             if (!dbContext.Products.Any())
             {
-                for (var i = 0; i < 5; i++)
-                { 
-                    dbContext.Products.Add(new Database.Product() { Id = i+1, Name = "Product " + i.ToString(), Price = i, Inventory = i });
-                }
+                List<Db.Product> products = new List<Db.Product>()
+                {
+                    new Db.Product() { Id = 1, Name = "Keyboard", Price = 75, Inventory = 25 },
+                    new Db.Product() { Id = 2, Name = "Mouse", Price = 40, Inventory = 60 },
+                    new Db.Product() { Id = 3, Name = "Monitor", Price = 150, Inventory = 10 },
+                    new Db.Product() { Id = 4, Name = "Mousepad", Price = 20, Inventory = 30 },
+                    new Db.Product() { Id = 5, Name = "Router", Price = 60, Inventory = 15 }
+                };
 
-                //dbContext.Products.Add(new Database.Product() { Id = 1, Name = "Keyboard", Price = 75, Inventory = 25 });
-                //dbContext.Products.Add(new Database.Product() { Id = 2, Name = "Mouse", Price = 40, Inventory = 60 });
-                //dbContext.Products.Add(new Database.Product() { Id = 3, Name = "Monitor", Price = 150, Inventory = 10 });
-                //dbContext.Products.Add(new Database.Product() { Id = 4, Name = "Mousepad", Price = 20, Inventory = 30 });
-                //dbContext.Products.Add(new Database.Product() { Id = 5, Name = "Router", Price = 60, Inventory = 15 });
-
+                dbContext.AddRange(products);
                 dbContext.SaveChanges();
                 
             }
@@ -53,7 +52,7 @@ namespace ECommerce.Api.Products.Providers
                 var products = await dbContext.Products.ToListAsync();
                 if(products != null && products.Any())
                 {
-                    var result = mapper.Map<IEnumerable<Database.Product>, IEnumerable<Models.Product>>(products);
+                    var result = mapper.Map<IEnumerable<Db.Product>, IEnumerable<Models.Product>>(products);
                     return (true, result, null);
                 }
                 return (false, null, "Not found");
