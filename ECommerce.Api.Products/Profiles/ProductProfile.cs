@@ -9,7 +9,7 @@ namespace ECommerce.Api.Products.Profiles
     {
         public ProductProfile()
         {
-            CreateMap<Database.Product, Models.Product>();
+            CreateMap<Db.Product, Models.Product>();
         }
     }
 }
