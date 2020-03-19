@@ -85,8 +85,7 @@ namespace ECommerce.Api.Orders.Providers
                     .ToListAsync();
                 if (orders != null && orders.Any())
                 {
-                    var result = mapper.Map<IEnumerable<Db.Order>,
-                        IEnumerable<Models.Order>>(orders);
+                    var result = mapper.Map<IEnumerable<Db.Order>,IEnumerable<Models.Order>>(orders);
                     return (true, result, null);
                 }
                 return (false, null, "Not Found");

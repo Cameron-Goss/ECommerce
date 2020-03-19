@@ -13,10 +13,10 @@ namespace ECommerce.Api.Products.Tests
     public class ProductsServiceTest
     {
         [Fact]
-        public async Task GetProductsReturnsAllProducts()
+        public async Task GetProductsReturnsProductUsingValidId()
         {
             var options = new DbContextOptionsBuilder<ProductsDbContext>()
-                .UseInMemoryDatabase(nameof(GetProductsReturnsAllProducts))
+                .UseInMemoryDatabase(nameof(GetProductsReturnsProductUsingValidId))
                 .Options;
             var dbContext = new ProductsDbContext(options);
             CreateProducts(dbContext);
@@ -26,11 +26,12 @@ namespace ECommerce.Api.Products.Tests
             var mapper = new Mapper(configuration);
 
             var productsProvider = new ProductsProvider(dbContext, null, mapper);
-            var result = await productsProvider.GetProductsAsync();
+            var product = await productsProvider.GetProductAsync(1);
 
-            Assert.True(result.isSuccess);
-            Assert.True(result.Products.Any());
-            Assert.Null(result.ErrorMessage);
+            Assert.True(product.IsSuccess);
+            Assert.NotNull(product.Product);
+            Assert.True(product.Product.Id == 1);
+            Assert.Null(product.ErrorMessage);
         }
 
         private void CreateProducts(ProductsDbContext dbContext)
