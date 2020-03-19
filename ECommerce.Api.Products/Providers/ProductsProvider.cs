@@ -45,19 +45,42 @@ namespace ECommerce.Api.Products.Providers
             }
         }
 
+        public async Task<(bool IsSuccess, Models.Product Product, string ErrorMessage)> GetProductAsync(int id)
+        {
+            try
+            {
+                logger?.LogInformation($"Querying products with id: {id}");
+                var product = await dbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
+                if (product != null)
+                {
+                    logger?.LogInformation("Product found");
+                    var result = mapper.Map<Db.Product, Models.Product>(product);
+                    return (true, result, null);
+                }
+                return (false, null, "Not found");
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex.ToString());
+                return (false, null, ex.Message);
+            }
+        }
+
         public async Task<(bool isSuccess, IEnumerable<Models.Product> Products, string ErrorMessage)> GetProductsAsync()
         {
             try
             {
+                logger?.LogInformation("Querying products");
                 var products = await dbContext.Products.ToListAsync();
-                if(products != null && products.Any())
+                if (products != null && products.Any())
                 {
+                    logger?.LogInformation($"{products.Count} product(s) found");
                     var result = mapper.Map<IEnumerable<Db.Product>, IEnumerable<Models.Product>>(products);
                     return (true, result, null);
                 }
                 return (false, null, "Not found");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger?.LogError(ex.ToString());
                 return (false, null, ex.Message);
