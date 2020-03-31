@@ -22,20 +22,25 @@ namespace ECommerce.Api.Search.Services
         }
         public async Task<(bool isSuccess, IEnumerable<Product> Products, string ErrorMessage)> GetProductsAsync()
         {
-            try 
+            try
             {
-                var client = httpClientFactory.CreateClient("ProductsService");
-                var response = await client.GetAsync("api/products");
-                if (response.IsSuccessStatusCode) 
+                using (var client = this.httpClientFactory.CreateClient("ProductsService"))
                 {
-                    var content = await response.Content.ReadAsByteArrayAsync();
-                    var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-                    var result = JsonSerializer.Deserialize<IEnumerable<Product>>(content, options);
-                    return (true, result, null);
+                    logger?.LogInformation("Querying Products Service");
+                    var response = await client.GetAsync("api/products");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsByteArrayAsync();
+                        var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+                        var result = JsonSerializer.Deserialize<IEnumerable<Product>>(content, options);
+
+                        logger?.LogInformation($"{result.Count()} product(s) found");
+                        return (true, result, null);
+                    }
+                    return (false, null, response.ReasonPhrase);
                 }
-                return (false, null, response.ReasonPhrase);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger?.LogError(ex.ToString());
                 return (false, null, ex.Message);

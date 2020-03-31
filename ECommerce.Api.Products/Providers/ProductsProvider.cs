@@ -38,10 +38,12 @@ namespace ECommerce.Api.Products.Providers
                     new Db.Product() { Id = 4, Name = "Mousepad", Price = 20, Inventory = 30 },
                     new Db.Product() { Id = 5, Name = "Router", Price = 60, Inventory = 15 }
                 };
-
-                dbContext.AddRange(products);
+                                
+                dbContext.Products.AddRange(products);                
                 dbContext.SaveChanges();
-                
+
+                logger?.LogInformation("Products added to DB");
+
             }
         }
 

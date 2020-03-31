@@ -1,4 +1,5 @@
 ﻿using ECommerce.Api.Search.Interfaces;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +12,14 @@ namespace ECommerce.Api.Search.Services
         private readonly IOrdersService ordersService;
         private readonly IProductsService productsService;
         private readonly ICustomersService customersService;
+        private readonly ILogger<SearchService> logger;
 
-        public SearchService(IOrdersService ordersService, IProductsService productsService, ICustomersService customersService)
+        public SearchService(IOrdersService ordersService, IProductsService productsService, ICustomersService customersService, ILogger<SearchService> logger)
         {
             this.ordersService = ordersService;
             this.productsService = productsService;
             this.customersService = customersService;
+            this.logger = logger;
         }
         public async Task<(bool isSuccess, dynamic SearchResults)> SearchAsync(int customerId)
         {
@@ -30,17 +33,13 @@ namespace ECommerce.Api.Search.Services
                 {
                     foreach(var item in order.Items)
                     {
-                        item.ProductName = productsResult.isSuccess ?
-                            productsResult.Products.FirstOrDefault(p => p.Id == item.ProductId)?.Name : 
-                            "Product information is not availble";
+                        item.ProductName = productsResult.isSuccess ? productsResult.Products.FirstOrDefault(p => p.Id == item.ProductId)?.Name : "Product information is not availble";
                     }
                 }
 
                 var result = new
                 {
-                    Customer = customersResult.isSuccess ? 
-                            customersResult.Customer : 
-                            new { Name = "Customer information not available"},
+                    Customer = customersResult.isSuccess ? customersResult.Customer : new { Name = "Customer information not available"}, 
                     Orders = ordersResult.Orders
                 };
                 return (true, result);

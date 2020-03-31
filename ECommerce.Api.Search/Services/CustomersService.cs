@@ -25,17 +25,21 @@ namespace ECommerce.Api.Search.Services
         {
             try
             {
-                var client = httpClientFactory.CreateClient("CustomersService");
-                
-                var response = await client.GetAsync($"api/customers/{id}");
-                if (response.IsSuccessStatusCode)
+                using(var client = this.httpClientFactory.CreateClient("CustomersService"))
                 {
-                    var content = await response.Content.ReadAsByteArrayAsync();
-                    var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-                    var result = JsonSerializer.Deserialize<dynamic>(content, options);
-                    return (true, result, null);
-                }
-                return (false, null, response.ReasonPhrase);
+                    logger?.LogInformation("Querying Customers Service");
+                    var response = await client.GetAsync($"api/customers/{id}");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsByteArrayAsync();
+                        var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+                        var result = JsonSerializer.Deserialize<Customer>(content, options);
+
+                        logger?.LogInformation("Customer found");
+                        return (true, result, null);
+                    }
+                    return (false, null, response.ReasonPhrase);
+                }                
             }
             catch (Exception ex)
             {

@@ -28,10 +28,17 @@ namespace ECommerce.Api.Customers.Providers
         {
             if (!dbContext.Customers.Any())
             {
-                dbContext.Customers.Add(new Db.Customer() { Id = 1, Name = "Jessica Smith", Address = "20 Elm St." });
-                dbContext.Customers.Add(new Db.Customer() { Id = 2, Name = "John Smith", Address = "30 Main St." });
-                dbContext.Customers.Add(new Db.Customer() { Id = 3, Name = "William Johnson", Address = "100 10th St." });
+                List<Db.Customer> customers = new List<Db.Customer>()
+                {
+                    new Db.Customer() { Id = 1, Name = "Jessica Smith", Address = "20 Elm St." },
+                    new Db.Customer() { Id = 2, Name = "John Smith", Address = "30 Main St." },
+                    new Db.Customer() { Id = 3, Name = "William Johnson", Address = "100 10th St." }
+                };
+
+                dbContext.Customers.AddRange(customers);
                 dbContext.SaveChanges();
+
+                logger?.LogInformation("Customers added to DB");
             }
         }
 
