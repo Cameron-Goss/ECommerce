@@ -38,10 +38,12 @@ namespace ECommerce.Api.Search
             {
                 config.BaseAddress = new Uri(Configuration["Services:Orders"]);
             }).AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(5, _ => TimeSpan.FromMilliseconds(500)));
+
             services.AddHttpClient("ProductsService", config =>
             {
                 config.BaseAddress = new Uri(Configuration["Services:Products"]);
             }).AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(5, _ => TimeSpan.FromMilliseconds(500)));
+
             services.AddHttpClient("CustomersService", config =>
             {
                 config.BaseAddress = new Uri(Configuration["Services:Customers"]);

@@ -24,18 +24,23 @@ namespace ECommerce.Api.Search.Services
         {
             try
             {
-                var client = httpClientFactory.CreateClient("OrdersService");
-                var response = await client.GetAsync($"api/orders/{customerId}");
-                if (response.IsSuccessStatusCode)
+                using (var client = this.httpClientFactory.CreateClient("OrdersService"))
                 {
-                    var content = await response.Content.ReadAsByteArrayAsync();
-                    var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-                    var result = JsonSerializer.Deserialize<IEnumerable<Order>>(content, options);
-                    return (true, result, null);
+                    logger?.LogInformation("Querying Orders Service");
+                    var response = await client.GetAsync($"api/orders/{customerId}");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsByteArrayAsync();
+                        var options = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+                        var result = JsonSerializer.Deserialize<IEnumerable<Order>>(content, options);
+
+                        logger?.LogInformation($"{result.Count()} order(s) found");
+                        return (true, result, null);
+                    }
+                    return (false, null, response.ReasonPhrase);
                 }
-                return (false, null, response.ReasonPhrase);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 logger?.LogError(ex.ToString());
                 return (false, null, ex.Message);

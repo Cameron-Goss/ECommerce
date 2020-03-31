@@ -28,50 +28,57 @@ namespace ECommerce.Api.Orders.Providers
         {
             if (!dbContext.Orders.Any())
             {
-                dbContext.Orders.Add(new Order()
+                List<Db.Order> orders = new List<Order>()
                 {
-                    Id = 1,
-                    CustomerId = 1,
-                    OrderDate = DateTime.Now,
-                    Items = new List<OrderItem>()
+                    new Order()
                     {
-                        new OrderItem() { OrderId = 1, ProductId = 1, Quantity = 10, UnitPrice = 10 },
-                        new OrderItem() { OrderId = 1, ProductId = 2, Quantity = 10, UnitPrice = 10 },
-                        new OrderItem() { OrderId = 1, ProductId = 3, Quantity = 10, UnitPrice = 10 },
-                        new OrderItem() { OrderId = 2, ProductId = 2, Quantity = 10, UnitPrice = 10 },
-                        new OrderItem() { OrderId = 3, ProductId = 3, Quantity = 1, UnitPrice = 100 }
+                        Id = 1,
+                        CustomerId = 1,
+                        OrderDate = DateTime.Now,
+                        Items = new List<OrderItem>()
+                        {
+                            new OrderItem() { OrderId = 1, ProductId = 1, Quantity = 10, UnitPrice = 10 },
+                            new OrderItem() { OrderId = 1, ProductId = 2, Quantity = 10, UnitPrice = 10 },
+                            new OrderItem() { OrderId = 1, ProductId = 3, Quantity = 10, UnitPrice = 10 },
+                            new OrderItem() { OrderId = 2, ProductId = 2, Quantity = 10, UnitPrice = 10 },
+                            new OrderItem() { OrderId = 3, ProductId = 3, Quantity = 1, UnitPrice = 100 }
+                        },
+                        Total = 100
                     },
-                    Total = 100
-                });
-                dbContext.Orders.Add(new Order()
-                {
-                    Id = 2,
-                    CustomerId = 1,
-                    OrderDate = DateTime.Now.AddDays(-1),
-                    Items = new List<OrderItem>()
+                    new Order()
                     {
-                        new OrderItem() { OrderId = 1, ProductId = 1, Quantity = 10, UnitPrice = 10 },
-                        new OrderItem() { OrderId = 1, ProductId = 2, Quantity = 10, UnitPrice = 10 },
-                        new OrderItem() { OrderId = 1, ProductId = 3, Quantity = 10, UnitPrice = 10 },
-                        new OrderItem() { OrderId = 2, ProductId = 2, Quantity = 10, UnitPrice = 10 },
-                        new OrderItem() { OrderId = 3, ProductId = 3, Quantity = 1, UnitPrice = 100 }
+                        Id = 2,
+                        CustomerId = 1,
+                        OrderDate = DateTime.Now.AddDays(-1),
+                        Items = new List<OrderItem>()
+                        {
+                            new OrderItem() { OrderId = 1, ProductId = 1, Quantity = 10, UnitPrice = 10 },
+                            new OrderItem() { OrderId = 1, ProductId = 2, Quantity = 10, UnitPrice = 10 },
+                            new OrderItem() { OrderId = 1, ProductId = 3, Quantity = 10, UnitPrice = 10 },
+                            new OrderItem() { OrderId = 2, ProductId = 2, Quantity = 10, UnitPrice = 10 },
+                            new OrderItem() { OrderId = 3, ProductId = 3, Quantity = 1, UnitPrice = 100 }
+                        },
+                        Total = 100
                     },
-                    Total = 100
-                });
-                dbContext.Orders.Add(new Order()
-                {
-                    Id = 3,
-                    CustomerId = 2,
-                    OrderDate = DateTime.Now,
-                    Items = new List<OrderItem>()
+                    new Order()
                     {
-                        new OrderItem() { OrderId = 1, ProductId = 1, Quantity = 10, UnitPrice = 10 },
-                        new OrderItem() { OrderId = 2, ProductId = 2, Quantity = 10, UnitPrice = 10 },
-                        new OrderItem() { OrderId = 3, ProductId = 3, Quantity = 1, UnitPrice = 100 }
-                    },
-                    Total = 100
-                });
+                        Id = 3,
+                        CustomerId = 2,
+                        OrderDate = DateTime.Now,
+                        Items = new List<OrderItem>()
+                        {
+                            new OrderItem() { OrderId = 1, ProductId = 1, Quantity = 10, UnitPrice = 10 },
+                            new OrderItem() { OrderId = 2, ProductId = 2, Quantity = 10, UnitPrice = 10 },
+                            new OrderItem() { OrderId = 3, ProductId = 3, Quantity = 1, UnitPrice = 100 }
+                        },
+                        Total = 100
+                    } 
+                };
+
+                dbContext.Orders.AddRange(orders);
                 dbContext.SaveChanges();
+
+                logger?.LogInformation("Orders added to DB");
             }
         }
 
@@ -79,12 +86,14 @@ namespace ECommerce.Api.Orders.Providers
         {
             try
             {
+                logger?.LogInformation("Querying orders");
                 var orders = await dbContext.Orders
                     .Where(o => o.CustomerId == customerId)
                     .Include(o => o.Items)
                     .ToListAsync();
                 if (orders != null && orders.Any())
                 {
+                    logger?.LogInformation($"{orders.Count()} order(s) found");
                     var result = mapper.Map<IEnumerable<Db.Order>,IEnumerable<Models.Order>>(orders);
                     return (true, result, null);
                 }
